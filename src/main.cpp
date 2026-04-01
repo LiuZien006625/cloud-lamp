@@ -19,7 +19,7 @@ int touchValue;
 int lampState = LOW;
 int buttonState;
 static uint8_t Shue = 0;
-
+int lampMode = 1; // 1: thunderstorm, 2: breathing, 3: rainbow, 4: meteor
 
 
 void breathing() {
@@ -29,7 +29,6 @@ void breathing() {
   FastLED.show();
 }
 
-
 void rainbowFlow(uint8_t hue) {
   
   fill_rainbow(leds, NUM_LEDS, hue, 7);
@@ -37,11 +36,6 @@ void rainbowFlow(uint8_t hue) {
   fadeToBlackBy(leds, NUM_LEDS, 50);
   FastLED.show();
 }
-
-
-
-  
-
 
 void meteor() {
   static int pos = 0;
@@ -52,9 +46,6 @@ void meteor() {
   FastLED.show();
   delay(30); 
 }
-
-
-
 
 void thunderstorm() {
   // Randomly decide to create a flash
@@ -90,7 +81,6 @@ void thunderstorm() {
 
 }
 
-
 void updateLEDs(int touchValue){
   Serial.print("Value: ");
   Serial.println(touchValue);
@@ -117,7 +107,6 @@ bool debounceReady() {
   }
 }
 
-
 void setup() {
   Serial.begin(115200);
   delay(2000); // give me time to bring up serial monitor
@@ -136,13 +125,28 @@ void loop() {
 
   
   if (lampState == HIGH){
+
+    switch (lampMode) {
+            case 1:
+                thunderstorm();
+                break;
+            case 2:
+                breathing();
+                break;
+            case 3:
+                rainbowFlow(Shue);
+                break;
+            case 4:
+                meteor();
+                break;
+    }
     //Randomly decide to create a flash
     // if (random(100) < 10) { // 10% chance per cycle to start a flash
     //   thunderstorm();
     //   delay(100);
     // breathing();
     //   delay(500);
-      rainbowFlow(Shue);
+      //rainbowFlow(Shue);
     //   delay(500);
     //   meteor();
     // }
@@ -154,8 +158,6 @@ void loop() {
       fadeToBlackBy(leds, NUM_LEDS, 50);
       FastLED.show();
     }
-
-
  delay(50);
 }
 

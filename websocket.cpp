@@ -54,19 +54,25 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 
     int ledId = receivedJson["id"];
 
-    if (ledId == 1) {
-        ledState1 = !ledState1;
-    } else if (ledId == 2) {
-        ledState2 = !ledState2;
-    } else if (ledId == 3) {
-        ledState3 = !ledState3;
-    // }else if (ledId == 4) {
-    //     ledState3 = !ledState4;
-    // }
+    switch (lampMode) {
+            case 1:
+                thunderstorm();
+                break;
+            case 2:
+                breathing();
+                break;
+            case 3:
+                rainbow();
+                break;
+            case 4:
+                meteor();
+                break;
+    }
+
     notifyClients();
     }
 }
-}
+
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
     switch (type) {
