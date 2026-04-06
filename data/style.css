@@ -1,8 +1,14 @@
 body {
     font-family: Arial;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    margin: 0px auto;
-    padding-top: 20px;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .button {
