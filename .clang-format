@@ -1,0 +1,18 @@
+# clang-format configuration for this repo.
+# Enforces 4-space indentation and spaces (no tabs).
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# Keep brace style consistent with existing code.
+BreakBeforeBraces: Attach
+
+# Avoid noisy diffs from include reordering.
+SortIncludes: false
+
+# Switch/case formatting.
+IndentCaseLabels: true
+
+# Keep lines reasonably wide.
+ColumnLimit: 120
