@@ -196,26 +196,61 @@ void thunderstorm() {
     }
 }
 
+
 void updateLEDs(int touchValue) {
-    Serial.print("Value: ");
-    Serial.println(touchValue);
-    if (touchValue >= touchLowThreshold && touchValue <= touchHighThreshold) {
+    static bool wasTouched = false;
+    static unsigned long consecutiveTouchStart = 0;
+    static bool isActivelyTouching = false;
+    bool isCurrentlyTouched = false;
 
-        if (lampState == LOW) {
-            lampState = HIGH;
-        } else {
-            lampState = LOW;
+    // Print the raw value every 500ms so we can keep monitoring
+    static unsigned long lastPrintTime = 0;
+    if (millis() - lastPrintTime > 500) {
+        Serial.print("Current touchValue: ");
+        Serial.println(touchValue);
+        lastPrintTime = millis();
+    }
+
+    // --- STATE-DEPENDENT THRESHOLDS ---
+    if (lampState == LOW) {
+        // When OFF, baseline is ~255. We look for a drop below 240 to register a touch.
+        isCurrentlyTouched = (touchValue < 240); 
+    } else {
+        // When ON, baseline is ~164. We look for a drop below 120 to register a touch.
+        // (You may need to tweak this "120" based on what the monitor shows when you touch it while ON!)
+        isCurrentlyTouched = (touchValue < 120); 
+    }
+
+    // Always check for a finger release
+    if (!isCurrentlyTouched) {
+        isActivelyTouching = false;
+        wasTouched = false;
+    }
+
+    // HARD LOCKOUT: Prevent toggling for 1 second after a state change
+    if (millis() - lastDebounceTime < debounceDelay) {
+        return; 
+    }
+
+    // TRUE DEBOUNCE
+    if (isCurrentlyTouched) {
+        if (!isActivelyTouching) {
+            consecutiveTouchStart = millis();
+            isActivelyTouching = true;
+        } else if (millis() - consecutiveTouchStart > 50) { 
+            if (!wasTouched) {
+                lampState = (lampState == LOW) ? HIGH : LOW;
+
+                Serial.print("Valid touch! New lampState: ");
+                Serial.println(lampState);
+
+                lastDebounceTime = millis(); 
+                wasTouched = true;           
+            }
         }
-
-        Serial.print(" - lampState: ");
-        Serial.println(lampState);
-        lastDebounceTime = millis();
     }
 }
 
-bool debounceReady() {
-    return (millis() - lastDebounceTime) > debounceDelay;
-}
 
 void setup() {
     Serial.begin(115200);
@@ -257,6 +292,7 @@ void setup() {
     }
 
     initWebSocket();
+    delay(2000); // Stabilize before starting capacitive touch
 }
 
 void loop() {
@@ -291,9 +327,7 @@ void loop() {
 
 
     touchValue = touchRead(touchPin);
-    if (debounceReady()) {
-        updateLEDs(touchValue);
-    }
+    updateLEDs(touchValue);
 
     if (lampState == HIGH) {
         switch (lampMode) {
