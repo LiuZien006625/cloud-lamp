@@ -313,6 +313,8 @@ void loop() {
             fill_solid(leds, NUM_LEDS, CRGB::Blue);
             FastLED.show();
 
+            server.end(); // Stop the web server to free up resources for the config portal
+
             WiFiManager wm;
             // Launch the portal on-demand
             if (!wm.startConfigPortal("CloudLamp_Setup")) {
