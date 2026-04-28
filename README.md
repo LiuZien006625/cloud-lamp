@@ -9,7 +9,7 @@ A DIY ESP32 cloud lamp with a local Web UI and capacitive touch controls.
 * **Web UI :** Access `http://cloudlamp.local` to change modes.
 * **Touch Control :** Tap Pin 4 to toggle ON/OFF. 
 * **Easy Wi-Fi :** Auto-creates `CloudLamp_Setup` portal if Wi-Fi fails.
-    - default ip 192.168.4.1
+    - default ip `192.168.4.1`
 
 ## 🌩️ Modes 
 
